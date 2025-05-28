@@ -124,7 +124,7 @@ Berdasarkan grafik di atas, terlihat bahwa pengguna dengan ID 414 merupakan user
 
 Selain dari sisi pengguna, jika ditinjau dari sisi film, terlihat bahwa film dengan Movie ID 356, 318, dan 296 adalah yang menerima jumlah rating terbanyak. Ini menunjukkan bahwa beberapa film memiliki tingkat popularitas yang sangat tinggi dan mampu menarik perhatian banyak pengguna untuk memberikan rating. Distribusi ini mengindikasikan adanya konsentrasi minat pada film-film tertentu yang kemungkinan besar memiliki kualitas cerita yang baik, aktor terkenal, atau eksposur yang tinggi di media.
 
-### 8. Tag Populer
+### 5. Tag Populer
 
 ![Tag Populer](images/tag_populer.png)
 
