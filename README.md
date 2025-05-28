@@ -324,7 +324,16 @@ Hasil rekomendasi menampilkan 10 film yang paling mirip dengan film input berdas
 
 #### Kelebihan dan Kekurangan Content Based Filtering
 
+**Kelebihan:**
+- Rekomendasi bersifat personal karena didasarkan pada preferensi pengguna itu sendiri.
+- Dapat memberikan rekomendasi untuk item baru yang belum pernah dirating oleh pengguna lain (mengatasi cold-start pada item).
+- Tidak terpengaruh oleh preferensi mayoritas, cocok untuk pengguna dengan selera unik.
+- Lebih mudah menjelaskan alasan di balik rekomendasi karena berdasarkan kemiripan fitur.
 
+**Kekurangan:**
+- Rekomendasi cenderung terbatas pada item yang mirip dengan yang sudah disukai pengguna sebelumnya (kurang bervariasi).
+- Memerlukan data fitur atau metadata yang lengkap dan relevan untuk setiap item, seperti genre, sinopsis, atau tahun rilis.
+- Tidak dapat menangkap preferensi implisit atau pola minat yang kompleks dari pengguna.
 
 ### 2. Model Sistem Rekomendasi Collaborative Filtering
 
@@ -466,7 +475,16 @@ history = model.fit(
 ```
 #### Kelebihan dan Kekurangan Collaborative Content Filtering
 
+**Kelebihan:**
+- Dapat memberikan rekomendasi berdasarkan pola perilaku kolektif dari banyak pengguna.
+- Mampu menyarankan item yang belum pernah dilihat atau diberi rating oleh pengguna, selama ada pola kemiripan dengan pengguna lain.
+- Lebih fleksibel dalam mengeksplorasi item baru yang mungkin tidak mirip secara konten tetapi disukai oleh pengguna serupa.
 
+**Kekurangan:**
+- Mengalami masalah cold-start untuk pengguna baru karena belum ada riwayat interaksi atau rating.
+- Rentan terhadap masalah sparsity jika data interaksi pengguna terhadap item sangat sedikit.
+- Lebih sulit untuk menjelaskan secara eksplisit alasan munculnya suatu rekomendasi karena berbasis pola rating.
+- Membutuhkan data dalam jumlah besar dan distribusi interaksi yang merata agar performanya optimal.
 
 ## Evaluasi
 
