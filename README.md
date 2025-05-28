@@ -38,14 +38,97 @@ Collaborative Filtering membangun sistem rekomendasi berdasarkan penilaian atau 
 
 ## Data Understanding
 Dataset yang digunakan dalam proyek ini berjudul [*Movie Recommendation Data*](https://www.kaggle.com/datasets/rohan4050/movie-recommendation-data). dan tersedia di platform Kaggle . Dataset ini berisi data film, rating pengguna, serta informasi terkait yang mendukung pengembangan sistem rekomendasi film.
-Terdapat beberapa file utama yang digunakan, yaitu:  
-- **movies.csv**, yang berisi informasi film seperti judul dan genre,  
-- **ratings.csv**, yang berisi data rating yang diberikan oleh pengguna kepada film,  
-- **tags.csv**, yang berisi tag atau label tambahan dari pengguna untuk film tertentu,  
-- **links.csv**, yang menghubungkan ID film dalam dataset dengan ID film di platform lain seperti IMDb dan TMDb.
+Terdapat beberapa file utama yang digunakan, yaitu: `movies.csv`, `ratings.csv`, `tags.csv`, dan `links.csv`.
 
+### 1. **movies.csv**
 
+   File ini berisi informasi tentang daftar film yang digunakan sebagai dasar dalam sistem rekomendasi, termasuk judul dan genre dari masing-masing film.
+   
+   - Jumlah data: 9.742 baris
+   - Jumlah kolom: 3 Kolom
+   - Missing value: Tidak terdapat missing value pada semua kolom (movieId, title, genres)
+    
+  | No | Nama Kolom | Tipe Data | Keterangan                                                                                     |
+  |----|------------|-----------|------------------------------------------------------------------------------------------------|
+  | 0  | movieId    | int64     | ID unik untuk setiap film. Digunakan sebagai penghubung antar file dataset.                    |
+  | 1  | title      | object    | Judul lengkap film, biasanya mencantumkan tahun rilis. Contoh: *Toy Story (1995)*.             |
+  | 2  | genres     | object    | Genre film tersebut, contoh: `Adventure, Comedy, atau Fantasy`.                                |                            
 
+### 2. **ratings.csv**
+
+File ini berisikan informasi mengenai rating yang diberikan pengguna kepada masing-masing film yang sudah ditontonnya.
+- Jumlah Data: 100836 baris
+- Jumlah Kolom: 4 Kolom
+- Missing Value: Tidak terdapat missing value pada semua kolom (userId, movieId, ratings, timestamp)
+
+| No | Nama Kolom  | Tipe Data | Keterangan                                                                                 |
+|----|-------------|-----------|--------------------------------------------------------------------------------------------|
+| 0  | `userId`    | int64     | ID unik untuk setiap pengguna yang memberikan rating film.                                 |
+| 1  | `movieId`   | int64     | ID unik untuk setiap film yang dinilai, menghubungkan ke dataset film lainnya.             |
+| 2  | `rating`    | float64   | Nilai rating yang diberikan pengguna ke film, biasanya dalam rentang 0.5 hingga 5.0.       |
+| 3  | `timestamp` | int64     | Waktu ketika rating diberikan, dalam format Unix timestamp (detik sejak 1 Januari 1970).   |
+
+### 3. **tags.csv**,
+File ini berisikan informasi mengenai tag atau label tambahan dari pengguna untuk film tertentu.
+
+- Jumlah Data:  3683 Baris
+- Jumlah Kolom: 4 Kolom
+- Missing Value: Tidak terdapat missing value pada semua kolom (userId, movieId, tag, dan timestamp)
+
+| No | Nama Kolom  | Tipe Data | Keterangan                                                        |
+|----|-------------|-----------|------------------------------------------------------------------|
+| 0  | `userId`    | int64     | ID unik untuk setiap pengguna yang memberikan tag pada film.     |
+| 1  | `movieId`   | int64     | ID unik untuk setiap film yang diberi tag oleh pengguna.         |
+| 2  | `tag`       | object    | Kata kunci atau label yang diberikan pengguna untuk mendeskripsikan film. |
+| 3  | `timestamp` | int64     | Waktu ketika tag diberikan, dalam format Unix timestamp.         |
+
+### 4. **links.csv**
+
+File ini berisikan penghubung ID film dalam dataset dengan ID film di platform lain seperti IMDb dan TMDb.
+- Jumlah Data:  9742
+- Jumlah Kolom: 3 Kolom
+- Missing Value: Terdapat 8 missing value pada kolom `tmbId`
+
+| No | Nama Kolom | Tipe Data | Keterangan                                                   |
+|----|------------|-----------|-------------------------------------------------------------|
+| 0  | `movieId`  | int64     | ID unik untuk setiap film, digunakan sebagai kunci utama.   |
+| 1  | `imdbId`   | int64     | ID film di database IMDb, digunakan untuk referensi eksternal. |
+| 2  | `tmdbId`   | float64   | ID film di database TMDb, digunakan untuk referensi eksternal. Nilai bisa kosong (null). |
+
+## Exploratory Data Analysis (EDA)
+
+Tahap eksplorasi data ini dilakukan untuk memahami karakteristik umum dari dataset film dan interaksi pengguna, termasuk distribusi genre, aktivitas pengguna, serta pola rating film. Visualisasi digunakan untuk mendukung pemahaman data yang akan sangat membantu dalam proses pemodelan sistem rekomendasi film.
+
+### 1.  Jumlah Film Unik
+
+Dataset ini memuat sebanyak **9.742 film unik**, masing-masing diidentifikasi melalui `movieId`. Film pertama dalam dataset adalah *Toy Story (1995)* dengan 215 rating, sedangkan banyak film lainnya hanya menerima satu atau dua rating, seperti *No Game No Life: Zero (2017)* atau *Flint (2017)*.
+
+### 2. Distribusi Genre Film
+
+![Distribusi Genre](images/distribusi_genre.png)
+
+Berdasarkan grafik jumlah film per genre, dapat disimpulkan bahwa genre Drama dan Comedy merupakan yang paling banyak diproduksi, diikuti oleh Thriller, Action, dan Romance, yang juga menunjukkan popularitas tinggi di industri film. Sementara itu, genre seperti IMAX, Film-Noir, dan (no genres listed) memiliki jumlah film paling sedikit. Data ini mencerminkan keragaman genre dalam industri film serta dapat dijadikan acuan untuk melihat tren pasar, menyusun strategi produksi, atau mengeksplorasi genre-genre yang masih jarang digarap.
+
+### 3. Analisis Aktivitas Pengguna 
+
+![Jumlah Rating per Film](images/jumlah_rating_per_film.png)
+
+Berdasarkan grafik di atas, terlihat bahwa pengguna dengan ID 414 merupakan user yang memberikan rating terbanyak, disusul oleh user ID 599, 474, dan 448. Jumlah rating yang diberikan oleh pengguna menurun secara bertahap dari kiri ke kanan, menunjukkan distribusi kontribusi rating yang tidak merata di mana hanya sebagian kecil pengguna yang sangat aktif dalam memberikan penilaian. Hal ini dapat dimanfaatkan untuk memahami perilaku pengguna aktif serta menentukan target dalam strategi personalisasi atau promosi yang lebih tepat sasaran.
+
+### 4. Analisis Distribusi Rating Berdasarkan Aktivitas Pengguna dan Popularitas Film
+
+![Distribusi Rating](images/distribusi_rating.png)
+![Populatritas Film](images/jumlah_rating_terbanyak.png)
+
+Berdasarkan grafik di atas, terlihat bahwa pengguna dengan ID 414 merupakan user yang memberikan rating terbanyak, disusul oleh user ID 599, 474, dan 448. Jumlah rating yang diberikan oleh pengguna menurun secara bertahap dari kiri ke kanan, menunjukkan distribusi kontribusi rating yang tidak merata, di mana hanya sebagian kecil pengguna yang sangat aktif dalam memberikan penilaian. Hal ini dapat dimanfaatkan untuk memahami perilaku pengguna aktif serta menentukan target dalam strategi personalisasi atau promosi yang lebih tepat sasaran.
+
+Selain dari sisi pengguna, jika ditinjau dari sisi film, terlihat bahwa film dengan Movie ID 356, 318, dan 296 adalah yang menerima jumlah rating terbanyak. Ini menunjukkan bahwa beberapa film memiliki tingkat popularitas yang sangat tinggi dan mampu menarik perhatian banyak pengguna untuk memberikan rating. Distribusi ini mengindikasikan adanya konsentrasi minat pada film-film tertentu yang kemungkinan besar memiliki kualitas cerita yang baik, aktor terkenal, atau eksposur yang tinggi di media.
+
+### 8. Tag Populer
+
+![Tag Populer](images/tag_populer.png)
+
+Grafik di atas menunjukkan 10 tag terpopuler yang digunakan oleh pengguna, di mana tag "In Netflix queue" menempati posisi teratas dengan frekuensi jauh lebih tinggi dibandingkan tag lainnya, menunjukkan bahwa banyak pengguna menggunakan tag ini sebagai pengingat tontonan. Tag "atmospheric" berada di urutan kedua, mengindikasikan ketertarikan terhadap film dengan suasana yang kuat. Sementara itu, tag seperti "thought-provoking", "superhero", dan "sci-fi" memiliki frekuensi yang relatif rendah, meskipun secara umum genre tersebut cukup populer. Tag lainnya seperti "quirky", "surreal", dan "funny" mencerminkan variasi selera pengguna terhadap gaya dan tone film. Keberadaan tag "Disney" dan "religion" juga memperlihatkan bahwa topik berdasarkan entitas dan tema khusus tetap mendapat perhatian meskipun tidak dominan. Secara keseluruhan, grafik ini memperlihatkan bahwa fungsi praktis (seperti menyimpan tontonan) lebih sering digunakan daripada tag berbasis genre atau tema.
 
 
 
