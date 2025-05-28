@@ -473,7 +473,7 @@ history = model.fit(
     validation_data=(x_val, y_val)
 )
 ```
-#### Kelebihan dan Kekurangan Collaborative Content Filtering
+#### Kelebihan dan Kekurangan Collaborative Filtering
 
 **Kelebihan:**
 - Dapat memberikan rekomendasi berdasarkan pola perilaku kolektif dari banyak pengguna.
