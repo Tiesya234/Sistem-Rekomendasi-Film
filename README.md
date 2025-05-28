@@ -130,5 +130,437 @@ Selain dari sisi pengguna, jika ditinjau dari sisi film, terlihat bahwa film den
 
 Grafik di atas menunjukkan 10 tag terpopuler yang digunakan oleh pengguna, di mana tag "In Netflix queue" menempati posisi teratas dengan frekuensi jauh lebih tinggi dibandingkan tag lainnya, menunjukkan bahwa banyak pengguna menggunakan tag ini sebagai pengingat tontonan. Tag "atmospheric" berada di urutan kedua, mengindikasikan ketertarikan terhadap film dengan suasana yang kuat. Sementara itu, tag seperti "thought-provoking", "superhero", dan "sci-fi" memiliki frekuensi yang relatif rendah, meskipun secara umum genre tersebut cukup populer. Tag lainnya seperti "quirky", "surreal", dan "funny" mencerminkan variasi selera pengguna terhadap gaya dan tone film. Keberadaan tag "Disney" dan "religion" juga memperlihatkan bahwa topik berdasarkan entitas dan tema khusus tetap mendapat perhatian meskipun tidak dominan. Secara keseluruhan, grafik ini memperlihatkan bahwa fungsi praktis (seperti menyimpan tontonan) lebih sering digunakan daripada tag berbasis genre atau tema.
 
+## Data Preprocessing
+### 1. Menggabungkan Variabel movieId Seluruh Dataset
+
+Pada tahapan ini, dilakukan proses penggabungan seluruh `movieId` yang terdapat pada empat dataset utama, yaitu `movies`, `ratings`, `tags`, dan `links`. Tujuannya adalah untuk memperoleh daftar lengkap semua ID film yang muncul di berbagai bagian data.
+Setelah seluruh `movieId` digabungkan, dilakukan penghapusan duplikasi agar hanya tersisa ID yang unik. Selanjutnya, ID-ID tersebut diurutkan untuk memudahkan proses referensi dan pencocokan antar tabel di tahapan selanjutnya. 
+   
+### 2. Menggabungkan Seluruh User
+
+Pada tahapan ini, dilakukan penggabungan seluruh user yang bertujuan untuk mengidentifikasi seluruh pengguna (`userId`) yang terdapat dalam dataset. Data `userId` diambil dari dua sumber utama, yaitu tabel `ratings` dan `tags`, karena kedua tabel ini merekam aktivitas pengguna terhadap film—baik dalam bentuk pemberian rating maupun penambahan tag.
+Seluruh ID pengguna kemudian digabungkan menjadi satu array, dan dilakukan penghapusan data duplikat untuk mendapatkan daftar pengguna yang unik. Setelah itu, `userId` diurutkan guna memudahkan pengolahan lebih lanjut.
+
+### 3. Menggabungkan Seluruh Dataset
+
+Pada tahapan ini, dilakukan penggabungan beberapa dataset utama yaitu `ratings_df`, `movies_df`, `links_df`, dan `tags_df`. Penggabungan dilakukan secara bertahap menggunakan fungsi `merge()` berdasarkan kolom `movieId` dan `userId`, dengan metode join `left` agar seluruh data dari `ratings_df` tetap terjaga.
+Setelah proses penggabungan, dilakukan penghapusan baris duplikat menggunakan fungsi `drop_duplicates()` dengan acuan kombinasi `userId` dan `movieId`, agar setiap pengguna hanya memberikan satu penilaian untuk satu film.
+Terakhir, dataset `movie_merge` diurutkan berdasarkan `userId` dan `movieId` agar tampilan data menjadi lebih rapi dan terstruktur. 
+
+### 4. Memeriksa Missing Value
+
+Pada tahapan ini, dilakukan pengecekan terhadap nilai yang hilang (*missing values*) dalam dataframe `movie_merge` yang merupakan hasil penggabungan beberapa dataset sebelumnya. Langkah ini penting untuk memastikan bahwa tidak ada kolom yang mengandung data kosong yang dapat mengganggu proses analisis atau pemodelan sistem rekomendasi.
+Digunakan juga fungsi `.isnull().sum()` untuk menghitung jumlah nilai kosong pada setiap kolom. Hasil dari proses ini akan menjadi acuan untuk menentukan apakah perlu dilakukan penanganan data hilang, seperti penghapusan baris atau pengisian nilai tertentu.
+
+### 5. Penggabungan Ratings Berdasarkan Variabel movieId
+
+Pada tahapan ini, data yang sudah digabungkan dalam `movie_merge` dikelompokkan berdasarkan kolom `movieId` menggunakan fungsi `groupby()`. Kemudian dilakukan agregasi dengan fungsi `sum()` untuk menjumlahkan nilai numerik yang ada pada setiap kelompok film.
+Proses ini berguna untuk mendapatkan ringkasan statistik total dari berbagai atribut yang berkaitan dengan masing-masing film, misalnya total rating atau jumlah tag jika dalam bentuk angka, sehingga memudahkan analisis lebih lanjut pada tingkat film.
+
+### 6. Menyimpan Data Rating Film
+
+Pada tahapan ini, seluruh data rating yang terdapat pada `ratings_df` disimpan ke dalam variabel `all_movie_rate`. Variabel ini akan digunakan untuk analisis atau proses lanjutan yang berfokus pada data rating film tanpa mengubah isi aslinya.
+Proses ini memudahkan pemisahan data rating dari dataset lainnya agar lebih mudah dikelola dan dianalisis secara spesifik.
+
+### 7. Menggabungkan Data Rating dengan Informasi Film
+
+Pada tahapan ini, data rating yang sudah disimpan pada variabel `all_movie_rate` digabungkan (merge) dengan data film (`movies_df`) yang berisi informasi `title` dan `genres` berdasarkan kolom `movieId`.
+
+Tujuannya adalah untuk mengaitkan setiap rating dengan judul film dan genre-nya, sehingga analisis selanjutnya dapat dilakukan dengan konteks film yang lengkap, bukan hanya berdasarkan ID film saja. Metode penggabungan yang digunakan adalah `left join` agar seluruh data rating tetap dipertahankan walaupun ada beberapa film yang mungkin tidak memiliki informasi lengkap pada tabel film.
+
+### 8. Penggabungan Data Genre dan Tag pada Film
+
+Pada tahapan ini, dataframe `all_movie_name` yang sudah berisi data rating beserta judul dan genre film digabungkan lagi dengan data `tags_df` yang berisi tag atau label yang diberikan oleh pengguna untuk setiap film berdasarkan `movieId`.
+Penggabungan menggunakan metode `left join` pada kolom `movieId` bertujuan untuk menambahkan informasi tag pada masing-masing film. Dengan ini, variabel `all_movie` akan berisi informasi lengkap mulai dari rating, judul, genre, hingga tag yang terkait dengan film tersebut. Data ini nantinya sangat berguna untuk analisis lebih mendalam terkait preferensi pengguna dan karakteristik film.
+
+## Data Preparation
+
+### 1. Penanganan Missing Value
+
+Pada tahapan ini, dilakukan pemeriksaan terhadap keberadaan nilai kosong (missing values) pada dataset `all_movie` menggunakan fungsi `isnull().sum()`. Hasil pemeriksaan menunjukkan ada beberapa nilai yang kosong, terutama pada kolom yang berasal dari penggabungan tag film.
+Untuk memastikan kualitas data yang baik dalam analisis selanjutnya, dilakukan pembersihan dengan menghapus seluruh baris yang mengandung missing value menggunakan fungsi `dropna()`. Dataset hasil pembersihan ini disimpan dalam variabel `clean_all_movie`.
+Setelah proses pembersihan, dilakukan pengecekan ulang untuk memastikan bahwa tidak ada lagi nilai kosong yang tersisa dalam dataset `clean_all_movie`.
+
+### 2. Tahapan Pengurutan dan Pemeriksaan Film Unik
+
+Pada tahapan ini, dataset `clean_all_movie` diurutkan berdasarkan kolom `movieId` secara ascending (dari nilai terkecil ke terbesar) menggunakan fungsi `sort_values()`. Hasil pengurutan ini disimpan ke dalam variabel `final_movie` agar data menjadi lebih terstruktur dan mudah untuk dianalisis lebih lanjut.
+Selanjutnya, dilakukan pengecekan jumlah film unik pada dataset `final_movie` dengan menghitung banyaknya nilai unik pada kolom `movieId` menggunakan fungsi `unique()` dan `len()`. Ini bertujuan untuk memastikan jumlah total film yang ada setelah proses pembersihan dan pengurutan data.
+
+### 3. Tahapan Finalisasi Data Film
+
+Pada tahapan ini, data `final_movie` kembali diurutkan berdasarkan kolom `movieId` menggunakan fungsi `sort_values()` untuk memastikan data tersusun rapi. Setelah itu, indeks pada dataframe direset dengan `reset_index(drop=True)` agar indeks baru dimulai dari 0 dan indeks lama dihapus.
+Hasilnya disimpan dalam variabel `prepared_movies` yang siap digunakan untuk analisis atau pemodelan selanjutnya, dengan data yang sudah bersih, terurut, dan terindeks dengan benar.
+
+### 4. Pengecekan dan Penghapusan Duplikat Film
+
+Pada tahapan ini, dilakukan pengecekan jumlah data yang duplikat berdasarkan kolom `movieId` menggunakan fungsi `duplicated()`. Variabel `jumlah_duplikat` menyimpan total baris yang duplikat.
+Selanjutnya, data yang memiliki `movieId` duplikat dihapus dengan fungsi `drop_duplicates()`, sehingga hanya tersisa satu baris unik untuk setiap film.
+Data hasil pembersihan duplikat ini kemudian disimpan kembali ke variabel `prepared_movies` dan siap untuk analisis lebih lanjut tanpa risiko data ganda.
+
+### 5. Konversi Data Series Menjadi List
+
+Pada tahap ini, tiga kolom utama dari dataframe `prepared_movies` diubah menjadi format list untuk memudahkan pemrosesan lebih lanjut, terutama dalam konteks pembuatan sistem rekomendasi atau analisis yang memerlukan input dalam bentuk list.
+
+- Variabel `movie_id` berisi daftar unik `movieId`.
+- Variabel `movie_name` berisi daftar judul film (`title`).
+- Variabel `movie_genre` berisi daftar genre film (`genres`).
+
+Jumlah elemen pada ketiga list tersebut diperiksa menggunakan fungsi `len()` untuk memastikan bahwa semua list memiliki panjang yang sama, yang menandakan konsistensi data.
+
+### 6. Membuat DataFrame Baru
+
+Pada tahapan ini, dilakukan pembuatan dataframe baru bernama `new_movies` yang merupakan hasil dari penggabungan tiga list: `movie_id`, `movie_name`, dan `movie_genre`. Ketiga list ini sebelumnya telah dikonversi dari dataframe `prepared_movies`.
+
+Fungsi `pd.DataFrame()` digunakan untuk membentuk struktur data tabular yang terdiri dari tiga kolom:
+- `id` untuk menyimpan nilai `movie_id`,
+- `movie_name` untuk menyimpan judul film,
+- `genre` untuk menyimpan informasi genre dari masing-masing film.
+- 
+Proses ini bertujuan untuk mempersiapkan data yang lebih terstruktur dan siap digunakan untuk analisis lebih lanjut.
+
+## Modeling
+
+Pada tahap ini, sistem rekomendasi film dikembangkan menggunakan dua pendekatan utama: Content-Based Filtering dan Collaborative Filtering. Masing-masing pendekatan memiliki karakteristik, parameter, kelebihan, dan kekurangannya dalam menghasilkan rekomendasi yang relevan bagi pengguna. Pendekatan Content-Based Filtering digunakan untuk merekomendasikan film berdasarkan kemiripan konten, khususnya genre film, sementara Collaborative Filtering akan memanfaatkan data interaksi pengguna, seperti rating dan tag, untuk mengidentifikasi pola preferensi yang serupa antar pengguna. 
+
+### 1. Model Development dengan Content Based Filtering
+
+Content-Based Filtering bekerja dengan menganalisis fitur konten dari setiap film dan memberikan rekomendasi berdasarkan kemiripan antar film. Dalam proyek ini, model dibangun dengan mengandalkan informasi dari kolom `genres` yang merepresentasikan kategori dari setiap film.
+
+#### Parameter yang Digunakan:
+
+- **Fitur teks**: Kolom `genres` dari setiap film.
+- **TF-IDF Vectorizer**: Mengubah data genre menjadi representasi numerik berbasis teks.
+  - `TfidfVectorizer()`: Mengubah genre menjadi fitur numerik.
+- **Cosine Similarity**: Untuk menghitung kemiripan antar film berdasarkan nilai TF-IDF.
+
+#### Tahapan Proses:
+
+**a. Inisialisasi dan Pelatihan TF-IDF Vectorizer:**
+
+Melakukan inisialisasi dan pelatihan TF-IDF pada data genre untuk membentuk matriks fitur.
+
+```python
+tf = TfidfVectorizer()
+tf.fit(new_movies['genre'])
+tf.get_feature_names_out()
+```
+
+**b. Transformasi Genre menjadi Matriks TF-IDF**
+
+Pada tahap ini, genre dari setiap film diubah menjadi representasi vektor numerik menggunakan metode TF-IDF. TF-IDF (Term Frequency-Inverse Document Frequency) membantu mengukur seberapa penting suatu kata (dalam hal ini genre) dalam satu dokumen relatif terhadap seluruh kumpulan dokumen.
+
+```python
+tfidf_matrix = tf.fit_transform(new_movies['genre'])
+tfidf_matrix.shape 
+```
+**c. Pembentukan Matriks Kemiripan (Cosine Similarity)**
+
+Setelah genre diformat ke dalam bentuk vektor melalui TF-IDF, langkah selanjutnya adalah menghitung tingkat kemiripan antar film menggunakan cosine similarity. Cosine similarity mengukur sudut antara dua vektor dalam ruang multidimensi, di mana nilai yang mendekati 1 menunjukkan kemiripan tinggi, sedangkan nilai mendekati 0 menunjukkan kemiripan rendah.
+
+```python
+cosine_sim = cosine_similarity(tfidf_matrix)
+cosine_sim
+```
+Selanjutnya membuat DataFrame dari matriks kemiripan tersebut dengan indeks dan kolom berupa nama film agar lebih mudah diinterpretasi.
+
+```python
+cosine_sim_df = pd.DataFrame(cosine_sim, index=new_movies['movie_name'], columns=new_movies['movie_name'])
+```
+
+**d. Fungsi Rekomendasi Film Berdasarkan Kemiripan Konten**
+
+Fungsi `movie_recommendations` bertujuan untuk memberikan daftar rekomendasi film yang paling mirip dengan film input (`nama_film`) berdasarkan matriks kemiripan (`similarity_data`).
+
+- Parameter fungsi:
+  - `nama_film`: Judul film yang dijadikan acuan untuk mencari rekomendasi.
+  - `similarity_data`: DataFrame matriks kemiripan antar film (default menggunakan `cosine_sim_df`).
+  - `items`: DataFrame yang berisi informasi film seperti judul dan genre (default menggunakan subset dari `new_movies`).
+  - `k`: Jumlah rekomendasi yang ingin ditampilkan (default 10).
+
+- Cara kerja fungsi:
+  1. Mendapatkan indeks film yang memiliki nilai kemiripan tertinggi dengan film input menggunakan metode `argpartition` untuk efisiensi.
+  2. Mengambil judul film yang paling mirip tersebut.
+  3. Menghapus film input dari daftar rekomendasi agar tidak muncul sebagai rekomendasi dirinya sendiri.
+  4. Menggabungkan daftar film terdekat dengan informasi film dari `items`.
+  5. Mengembalikan hasil berupa DataFrame berisi rekomendasi film dengan jumlah maksimal `k`.
+
+- Fungsi ini memungkinkan pengguna mendapatkan rekomendasi film serupa secara cepat berdasarkan genre yang sudah diolah dengan TF-IDF dan cosine similarity.
+
+```python
+def movie_recommendations(nama_film, similarity_data=cosine_sim_df, items=new_movies[['movie_name', 'genre']], k=10):
+    index = similarity_data.loc[:, nama_film].to_numpy().argpartition(range(-1, -k, -1))
+    closest = similarity_data.columns[index[-1:-(k+2):-1]]
+    closest = closest.drop(nama_film, errors='ignore')
+    return pd.DataFrame(closest).merge(items).head(k)
+```
+
+**e. Contoh Penggunaan Fungsi Rekomendasi**
+
+Pada contoh ini, kita akan menampilkan data film dengan judul **"Poltergeist II: The Other Side (1986)"** untuk melihat genre dan detail film yang menjadi input rekomendasi.
+
+```python
+new_movies[new_movies.movie_name.eq('Poltergeist II: The Other Side (1986)')]
+```
+Kemudian, fungsi movie_recommendations dipanggil dengan judul film tersebut sebagai parameter untuk mendapatkan daftar film yang mirip berdasarkan genre.
+
+```python
+movie_recommendations('Poltergeist II: The Other Side (1986)')
+```
+
+Hasil rekomendasi menampilkan 10 film yang paling mirip dengan film input berdasarkan kemiripan genre. Film-film ini umumnya memiliki genre Horror dan Thriller, menunjukkan bahwa sistem mampu merekomendasikan film dengan konten yang serupa secara akurat.
+| No | Movie Name                   | Genre                  |
+|----|-----------------------------|------------------------|
+| 1  | Haunting, The (1963)        | Horror\|Thriller       |
+| 2  | Haunting, The (1999)        | Horror\|Thriller       |
+| 3  | Cujo (1983)                 | Horror\|Thriller       |
+| 4  | Poltergeist (1982)          | Horror\|Thriller       |
+| 5  | Children of the Corn (1984) | Horror\|Thriller       |
+| 6  | Birds, The (1963)           | Horror\|Thriller       |
+| 7  | Final Destination 2 (2003)  | Horror\|Thriller       |
+| 8  | Session 9 (2001)            | Horror\|Thriller       |
+| 9  | Blair Witch Project, The (1999) | Drama\|Horror\|Thriller |
+| 10 | Ginger Snaps (2000)         | Drama\|Horror\|Thriller |
+
+
+#### Kelebihan dan Kekurangan Content Based Filtering
+
+
+
+### 2. Model Sistem Rekomendasi Collaborative Filtering
+
+Collaborative Filtering memanfaatkan interaksi antara pengguna (userId) dan item (movieId) dalam bentuk rating untuk membangun model rekomendasi. Model ini berbasis Matrix Factorization dengan embedding untuk menangkap hubungan laten antar user dan film.
+
+#### Parameter yang Digunakan:
+
+* `embedding_size`: 50
+* `loss`: BinaryCrossentropy
+* `optimizer`: Adam
+* `metrics`: : Root Mean Squared Error (RMSE) dan Mean Absolute Error (MAE)
+
+#### Tahapan Proses:
+
+**a. Menyalin Dataset Asli**
+
+Langkah pertama adalah membuat salinan dataset `ratings_df` ke dalam variabel `df` agar proses selanjutnya tidak mengubah data asli.
+
+```python
+df = ratings_df
+df
+```
+**b. Encoding userId**
+
+Langkah selanjutnya adalah melakukan encoding terhadap `userId`. Pertama, diambil seluruh nilai unik dari kolom `userId` untuk mendapatkan daftar pengguna tanpa duplikasi. Kemudian, dilakukan proses encoding yaitu mengubah setiap `userId` menjadi angka menggunakan `enumerate` yang disimpan ke dalam dictionary `user_to_user_encoded`.
+Selain itu, dibuat juga dictionary kebalikannya, yaitu `user_encoded_to_user`, yang berguna untuk mengonversi kembali dari nilai numerik ke `userId` aslinya.
+
+```python
+user_ids = df['userId'].unique().tolist()
+user_to_user_encoded = {x: i for i, x in enumerate(user_ids)}
+user_encoded_to_user = {i: x for i, x in enumerate(user_ids)}
+```
+
+**c. Encoding movieId**
+
+Selanjutnya dilakukan proses encoding pada kolom `movieId`. Pertama, semua nilai unik dari `movieId` diambil untuk membentuk daftar film tanpa duplikasi. Setelah itu, setiap `movieId` diubah menjadi representasi angka menggunakan `enumerate`, dan hasilnya disimpan ke dalam dictionary `movie_to_movie_encoded`. Untuk keperluan decoding kembali, dibuat juga dictionary kebalikannya yaitu `movie_encoded_to_movie`.
+
+```python
+movie_ids = df['movieId'].unique().tolist()
+movie_to_movie_encoded = {x: i for i, x in enumerate(movie_ids)}
+movie_encoded_to_movie = {i: x for i, x in enumerate(movie_ids)}
+```
+Setelah proses encoding, hasilnya kemudian dipetakan ke dalam dataframe. Kolom `genres` diisi dengan hasil mapping dari `userId` yang telah diencoding, sedangkan kolom movies diisi dengan hasil encoding dari `movieId`.
+
+```python
+df['genres'] = df['userId'].map(user_to_user_encoded)
+df['movies'] = df['movieId'].map(movie_to_movie_encoded)
+```
+
+**d. Menentukan Jumlah User dan Film serta Rentang Rating**
+
+Setelah proses encoding selesai, langkah selanjutnya adalah menentukan jumlah total user dan film yang telah berhasil diencoding. Hal ini dilakukan dengan menghitung panjang dari dictionary `user_to_user_encoded` dan `movie_encoded_to_movie`. 
+
+Kemudian, kolom `rating` pada dataframe diubah tipenya menjadi `float32` agar sesuai dengan kebutuhan model dan efisien dalam komputasi. Selanjutnya, dicari nilai rating minimum dan maksimum yang ada pada dataset untuk mengetahui rentang nilai rating yang digunakan oleh pengguna.
+
+```python
+num_users = len(user_to_user_encoded)
+num_movie = len(movie_encoded_to_movie)
+
+df['ratings'] = df['rating'].values.astype(np.float32)
+
+min_rating = min(df['rating'])
+max_rating = max(df['rating'])
+
+print('Number of User: {}, Number of movie: {}, Min Rating: {}, Max Rating: {}'.format(
+    num_users, num_movie, min_rating, max_rating
+))
+```
+**e. Mengacak Data**
+
+Untuk menghindari bias urutan dalam proses training, data diacak secara acak dengan `random_state=42.`
+
+```python
+df = df.sample(frac=1, random_state=42)
+df
+```
+**f. Split Dataset**
+
+Pada tahap ini, dilakukan pemisahan dataset menjadi data latih dan data validasi. Pertama-tama, kolom `genres` dan `movies` yang telah diencoding digabungkan menjadi array fitur `x`, yang akan digunakan sebagai input model.
+
+Selanjutnya, nilai `rating` yang telah dikonversi ke tipe `float32` dinormalisasi ke dalam rentang 0 hingga 1, dengan rumus:
+
+`normalized_rating = (rating - min_rating) / (max_rating - min_rating)`
+
+Hasil normalisasi disimpan dalam array target `y`. Dataset kemudian dibagi menjadi dua bagian, yaitu 80% untuk data latih (`x_train`, `y_train`) dan 20% untuk data validasi (`x_val`, `y_val`) berdasarkan indeks batas `split_point`.
+
+```python
+x = df.loc[:, ['genres', 'movies']].to_numpy()
+
+y = (df['ratings'] - min_rating) / (max_rating - min_rating)
+y = y.to_numpy()
+
+split_point = int(len(df) * 0.8)
+
+x_train = x[:split_point]
+x_val = x[split_point:]
+y_train = y[:split_point]
+y_val = y[split_point:]
+
+print(x, y)
+```
+**g. Proses Pelatihan Model**
+
+Model rekomendasi dibuat menggunakan pendekatan *Matrix Factorization* yang mengandalkan layer embedding untuk merepresentasikan pengguna dan film ke dalam vektor berdimensi rendah. Kelas `RecommenderNet` diturunkan dari `tf.keras.Model` dan terdiri atas:
+
+- `user_embedding` dan `movie_embedding` untuk mempelajari representasi pengguna dan film.
+- `user_bias` dan `movie_bias` untuk mengakomodasi bias masing-masing entitas.
+- Metode `call` untuk menghitung *dot product* antara vektor pengguna dan film serta menjumlahkannya dengan bias masing-masing. Hasilnya diaktifkan dengan fungsi sigmoid untuk menghasilkan prediksi skor rating.
+
+Setelah model didefinisikan, dilakukan inisialisasi dengan `embedding_dim = 50`. Model dikompilasi dengan:
+
+- **Loss Function**: `BinaryCrossentropy`
+- **Optimizer**: `Adam` dengan `learning_rate = 0.001`
+- **Evaluation Metric**: `RootMeanSquaredError` (RMSE)
+
+Proses pelatihan dilakukan selama 100 epoch dengan `batch_size = 64`, dan validasi menggunakan 20% data.
+
+```python
+# Inisialisasi model
+model = RecommenderNet(num_users=num_users, num_movies=num_movie, embedding_dim=50)
+```
+```python
+# Kompilasi model
+model.compile(
+    loss=tf.keras.losses.BinaryCrossentropy(),
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+    metrics=[tf.keras.metrics.RootMeanSquaredError()]
+)
+```
+```python
+# Melatih model
+history = model.fit(
+    x_train,
+    y_train,
+    batch_size=64,
+    epochs=100,
+    validation_data=(x_val, y_val)
+)
+```
+#### Kelebihan dan Kekurangan Collaborative Content Filtering
+
+
+
+## Evaluasi
+
+### Visualisasi Performa Model
+
+Untuk mengevaluasi performa model dari waktu ke waktu, kita dapat memvisualisasikan nilai *Root Mean Squared Error* (RMSE) dan *Mean Absolute Error* (MAE) pada data latih dan validasi selama proses pelatihan.
+
+Plot ini membantu mengamati:
+
+- Apakah model mengalami **overfitting** (jika error validasi meningkat sementara error pelatihan terus menurun),
+- Apakah model sudah **konvergen** (jika error validasi dan pelatihan stabil),
+- Seberapa besar perbedaan error antara data latih dan data validasi.
+
+![Visualisasi Performa Model](images/rmse.png)
+
+Grafik menunjukkan bahwa nilai root mean squared error (RMSE) pada data pelatihan mengalami penurunan tajam di awal pelatihan dan kemudian stabil di sekitar angka 0.19, yang mengindikasikan bahwa model berhasil belajar dengan baik dari data. Sementara itu, nilai RMSE pada data pengujian juga menurun di awal dan stabil di kisaran 0.206–0.208. Meskipun terdapat selisih antara performa pada data pelatihan dan pengujian, tren keduanya cenderung stabil tanpa fluktuasi besar, yang menunjukkan bahwa model memiliki kinerja yang cukup baik dan konsisten selama proses pelatihan.
+
+![Visualisasi Performa Model](images/mae.png)
+
+Grafik MAE menunjukkan bahwa nilai error pada data training menurun tajam di awal epoch dan terus membaik hingga mencapai nilai yang stabil mendekati 0.145, sementara nilai MAE pada data validasi juga mengalami penurunan pada awal pelatihan namun kemudian cenderung stabil di kisaran 0.16 dengan sedikit fluktuasi. Pola ini mengindikasikan bahwa model mampu belajar dengan baik dari data training dan mempertahankan performa yang cukup konsisten pada data validasi. Meskipun tidak ada penurunan signifikan pada MAE validasi setelah beberapa epoch, performa model secara keseluruhan terlihat cukup baik dan stabil. 
+
+## Implementasi Model Untuk Sistem Rekomendasi Film
+
+Tahapan ini digunakan untuk **menampilkan rekomendasi film** kepada seorang pengguna berdasarkan model prediktif yang telah dilatih sebelumnya. Secara garis besar, proses yang dilakukan adalah sebagai berikut:
+
+1. **Prediksi Rating Film**  
+   Baris `df = model.predict(user_movie_array).flatten()` digunakan untuk memprediksi skor atau rating yang mungkin diberikan pengguna terhadap film yang belum ditonton. Hasilnya berupa array satu dimensi.
+
+2. **Mengambil 10 Film dengan Skor Tertinggi**  
+   Kode `df.argsort()[-10:][::-1]` digunakan untuk mengambil indeks dari 10 film dengan prediksi rating tertinggi. Nilai-nilai ini kemudian dikonversi kembali ke ID film asli menggunakan `movie_encoded_to_movie`.
+
+3. **Menampilkan Film yang Sudah Ditonton dan Dinilai Tinggi oleh Pengguna**  
+   Kode ini juga mengambil 5 film dengan rating tertinggi yang sebelumnya telah ditonton oleh pengguna, untuk memberikan konteks dan menunjukkan selera pengguna berdasarkan data historis.
+
+4. **Menampilkan Rekomendasi Film**  
+   Terakhir, 10 film yang direkomendasikan berdasarkan prediksi ditampilkan bersama dengan nama dan genre-nya, memberikan saran yang dipersonalisasi untuk pengguna.
+
+Sehingga di dapatkan hasil seperti ini:
+
+### Rekomendasi Film untuk Pengguna: 234
+
+#### Film dengan Rating Tertinggi oleh Pengguna
+
+| Judul Film               | Genre                                    |
+|--------------------------|-------------------------------------------|
+| Toy Story (1995)         | Adventure, Animation, Children, Comedy, Fantasy |
+| Batman Forever (1995)    | Action, Adventure, Comedy, Crime          |
+
+#### Top 10 Rekomendasi Film
+
+| No | Judul Film                                  | Genre                                      |
+|----|----------------------------------------------|---------------------------------------------|
+| 1  | Two Family House (2000)                      | Drama                                      |
+| 2  | Hope and Glory (1987)                        | Drama                                      |
+| 3  | More (1998)                                  | Animation, Drama, Sci-Fi, IMAX             |
+| 4  | Lady Jane (1986)                             | Drama, Romance                             |
+| 5  | Awful Truth, The (1937)                      | Comedy, Romance                            |
+| 6  | Come and See (Idi i smotri) (1985)           | Drama, War                                 |
+| 7  | Adam's Rib (1949)                            | Comedy, Romance                            |
+| 8  | Wild Parrots of Telegraph Hill, The (2003)   | Documentary                                |
+| 9  | Reefer Madness: The Movie Musical (2005)     | Comedy, Drama, Musical                     |
+| 10 | Paterson                                     | (no genres listed)                         |
+
+## Evaluasi Terhadap Bussiness Understanding
+
+### Menjawab Problem Statements
+
+Model rekomendasi yang dikembangkan berhasil menjawab ketiga permasalahan utama yang dirumuskan dalam tahap business understanding. Dengan menggabungkan pendekatan Content-Based Filtering dan Collaborative Filtering, sistem dapat memberikan rekomendasi film yang relevan, personal, dan beragam bagi pengguna.
+
+- Masalah kesulitan pengguna dalam menemukan film yang sesuai berhasil diatasi dengan sistem yang mampu memahami preferensi individual pengguna dan menyarankan film serupa dengan yang pernah disukai.
+- Film berkualitas yang kurang populer dapat terekspos karena sistem tidak hanya bergantung pada popularitas, tetapi juga mempertimbangkan kesamaan konten dan pola preferensi pengguna lain.
+- Sistem ini mengimplementasikan integrasi antara dua metode filtering untuk memberikan hasil yang lebih komprehensif dan akurat dalam merekomendasikan film.
+
+### Mencapai Goals
+
+Proyek ini berhasil mencapai tujuan utama yaitu menciptakan sistem rekomendasi film yang berbasis data, personal, dan efektif dalam mengeksplorasi preferensi pengguna.
+
+- **Content-Based Filtering** memungkinkan sistem mengenali pola konten dari film yang pernah disukai pengguna dan merekomendasikan film serupa berdasarkan genre atau deskripsi lainnya.
+- **Collaborative Filtering** menggunakan jaringan neural (RecommenderNet) untuk mempelajari interaksi pengguna secara kolektif, sehingga sistem mampu menyarankan film baru yang belum pernah ditonton, tetapi kemungkinan besar disukai.
+- Kombinasi kedua pendekatan ini menghasilkan sistem yang tidak hanya akurat, tetapi juga fleksibel dalam menyesuaikan saran berdasarkan baik konten maupun perilaku pengguna lain.
+
+### Dampak dari Solution Approach
+
+Solusi yang dirancang membawa dampak signifikan dalam meningkatkan kualitas pengalaman pengguna dalam memilih film:
+
+- Content-Based Filtering meningkatkan relevansi rekomendasi berdasarkan karakteristik film yang telah disukai pengguna.
+- Collaborative Filtering memperluas cakupan rekomendasi dengan mempertimbangkan film yang disukai pengguna lain yang memiliki preferensi serupa.
+- Sistem berhasil menyarankan film-film berkualitas, termasuk film lama atau kurang populer, yang relevan dengan preferensi pengguna, sehingga dapat meningkatkan visibilitas film tersebut.
+- Evaluasi model menunjukkan bahwa sistem mampu menghasilkan rekomendasi yang sesuai dan bermanfaat, dengan hasil rekomendasi akhir yang mencerminkan pemahaman yang baik terhadap selera pengguna.
+
+## Kesimpulan
+
+Proyek ini berhasil mengembangkan sistem rekomendasi film yang menggabungkan pendekatan Content-Based dan Collaborative Filtering secara efektif. Dimulai dari pemahaman masalah (Business Understanding), eksplorasi dan pengolahan data (Data Understanding & Preparation), hingga pengembangan dan evaluasi model, sistem mampu memenuhi tujuan yang telah ditetapkan.
+
+Dengan memanfaatkan informasi konten dan interaksi pengguna, sistem dapat memberikan rekomendasi film yang lebih relevan dan personal. Rekomendasi yang dihasilkan tidak hanya membantu pengguna menemukan film yang sesuai dengan minat mereka, tetapi juga memperkenalkan film-film yang sebelumnya kurang terekspos. Hal ini dapat meningkatkan kepuasan pengguna sekaligus membuka peluang baru dalam distribusi dan konsumsi konten film. Sistem ini menjadi solusi digital yang efektif dalam menyederhanakan proses pemilihan film dan meningkatkan pengalaman menonton secara keseluruhan.
 
 
