@@ -218,20 +218,7 @@ Fungsi `pd.DataFrame()` digunakan untuk membentuk struktur data tabular yang ter
 - 
 Proses ini bertujuan untuk mempersiapkan data yang lebih terstruktur dan siap digunakan untuk analisis lebih lanjut.
 
-## Modeling
-
-Pada tahap ini, sistem rekomendasi film dikembangkan menggunakan dua pendekatan utama: Content-Based Filtering dan Collaborative Filtering. Masing-masing pendekatan memiliki karakteristik, parameter, kelebihan, dan kekurangannya dalam menghasilkan rekomendasi yang relevan bagi pengguna. Pendekatan Content-Based Filtering digunakan untuk merekomendasikan film berdasarkan kemiripan konten, khususnya genre film, sementara Collaborative Filtering akan memanfaatkan data interaksi pengguna, seperti rating dan tag, untuk mengidentifikasi pola preferensi yang serupa antar pengguna. 
-
-### 1. Model Development dengan Content Based Filtering
-
-Content-Based Filtering bekerja dengan menganalisis fitur konten dari setiap film dan memberikan rekomendasi berdasarkan kemiripan antar film. Dalam proyek ini, model dibangun dengan mengandalkan informasi dari kolom `genres` yang merepresentasikan kategori dari setiap film.
-
-#### Parameter yang Digunakan:
-
-- **Fitur teks**: Kolom `genres` dari setiap film.
-- **TF-IDF Vectorizer**: Mengubah data genre menjadi representasi numerik berbasis teks.
-  - `TfidfVectorizer()`: Mengubah genre menjadi fitur numerik.
-- **Cosine Similarity**: Untuk menghitung kemiripan antar film berdasarkan nilai TF-IDF.
+### 7. Persiapan Content-Based Filtering
 
 #### Tahapan Proses:
 
@@ -293,58 +280,7 @@ def movie_recommendations(nama_film, similarity_data=cosine_sim_df, items=new_mo
     closest = closest.drop(nama_film, errors='ignore')
     return pd.DataFrame(closest).merge(items).head(k)
 ```
-
-**e. Contoh Penggunaan Fungsi Rekomendasi**
-
-Pada contoh ini, kita akan menampilkan data film dengan judul **"Poltergeist II: The Other Side (1986)"** untuk melihat genre dan detail film yang menjadi input rekomendasi.
-
-```python
-new_movies[new_movies.movie_name.eq('Poltergeist II: The Other Side (1986)')]
-```
-Kemudian, fungsi movie_recommendations dipanggil dengan judul film tersebut sebagai parameter untuk mendapatkan daftar film yang mirip berdasarkan genre.
-
-```python
-movie_recommendations('Poltergeist II: The Other Side (1986)')
-```
-
-Hasil rekomendasi menampilkan 10 film yang paling mirip dengan film input berdasarkan kemiripan genre. Film-film ini umumnya memiliki genre Horror dan Thriller, menunjukkan bahwa sistem mampu merekomendasikan film dengan konten yang serupa secara akurat.
-| No | Movie Name                   | Genre                  |
-|----|-----------------------------|------------------------|
-| 1  | Haunting, The (1963)        | Horror\|Thriller       |
-| 2  | Haunting, The (1999)        | Horror\|Thriller       |
-| 3  | Cujo (1983)                 | Horror\|Thriller       |
-| 4  | Poltergeist (1982)          | Horror\|Thriller       |
-| 5  | Children of the Corn (1984) | Horror\|Thriller       |
-| 6  | Birds, The (1963)           | Horror\|Thriller       |
-| 7  | Final Destination 2 (2003)  | Horror\|Thriller       |
-| 8  | Session 9 (2001)            | Horror\|Thriller       |
-| 9  | Blair Witch Project, The (1999) | Drama\|Horror\|Thriller |
-| 10 | Ginger Snaps (2000)         | Drama\|Horror\|Thriller |
-
-
-#### Kelebihan dan Kekurangan Content Based Filtering
-
-**Kelebihan:**
-- Rekomendasi bersifat personal karena didasarkan pada preferensi pengguna itu sendiri.
-- Dapat memberikan rekomendasi untuk item baru yang belum pernah dirating oleh pengguna lain (mengatasi cold-start pada item).
-- Tidak terpengaruh oleh preferensi mayoritas, cocok untuk pengguna dengan selera unik.
-- Lebih mudah menjelaskan alasan di balik rekomendasi karena berdasarkan kemiripan fitur.
-
-**Kekurangan:**
-- Rekomendasi cenderung terbatas pada item yang mirip dengan yang sudah disukai pengguna sebelumnya (kurang bervariasi).
-- Memerlukan data fitur atau metadata yang lengkap dan relevan untuk setiap item, seperti genre, sinopsis, atau tahun rilis.
-- Tidak dapat menangkap preferensi implisit atau pola minat yang kompleks dari pengguna.
-
-### 2. Model Sistem Rekomendasi Collaborative Filtering
-
-Collaborative Filtering memanfaatkan interaksi antara pengguna (userId) dan item (movieId) dalam bentuk rating untuk membangun model rekomendasi. Model ini berbasis Matrix Factorization dengan embedding untuk menangkap hubungan laten antar user dan film.
-
-#### Parameter yang Digunakan:
-
-* `embedding_size`: 50
-* `loss`: BinaryCrossentropy
-* `optimizer`: Adam
-* `metrics`: : Root Mean Squared Error (RMSE) dan Mean Absolute Error (MAE)
+### 8. Persiapan Collaborative Filtering
 
 #### Tahapan Proses:
 
@@ -435,7 +371,75 @@ y_val = y[split_point:]
 
 print(x, y)
 ```
-**g. Proses Pelatihan Model**
+
+## Modeling
+
+Pada tahap ini, sistem rekomendasi film dikembangkan menggunakan dua pendekatan utama: Content-Based Filtering dan Collaborative Filtering. Masing-masing pendekatan memiliki karakteristik, parameter, kelebihan, dan kekurangannya dalam menghasilkan rekomendasi yang relevan bagi pengguna. Pendekatan Content-Based Filtering digunakan untuk merekomendasikan film berdasarkan kemiripan konten, khususnya genre film, sementara Collaborative Filtering akan memanfaatkan data interaksi pengguna, seperti rating dan tag, untuk mengidentifikasi pola preferensi yang serupa antar pengguna. 
+
+### 1. Model Sistem Rekomendasi dengan Content Based Filtering
+
+Content-Based Filtering bekerja dengan menganalisis fitur konten dari setiap film dan memberikan rekomendasi berdasarkan kemiripan antar film. Dalam proyek ini, model dibangun dengan mengandalkan informasi dari kolom `genres` yang merepresentasikan kategori dari setiap film.
+
+**a. Parameter Model yang Digunakan:**
+
+- **Fitur teks**: Kolom `genres` dari setiap film.
+- **TF-IDF Vectorizer**: Mengubah data genre menjadi representasi numerik berbasis teks.
+  - `TfidfVectorizer()`: Mengubah genre menjadi fitur numerik.
+- **Cosine Similarity**: Untuk menghitung kemiripan antar film berdasarkan nilai TF-IDF.
+
+**b. Hasil Rekomendasi Top-N dari Content-Based Filtering**
+
+Pada contoh ini, kita akan menampilkan data film dengan judul **"Poltergeist II: The Other Side (1986)"** untuk melihat genre dan detail film yang menjadi input rekomendasi.
+
+```python
+new_movies[new_movies.movie_name.eq('Poltergeist II: The Other Side (1986)')]
+```
+Kemudian, fungsi movie_recommendations dipanggil dengan judul film tersebut sebagai parameter untuk mendapatkan daftar film yang mirip berdasarkan genre.
+
+```python
+movie_recommendations('Poltergeist II: The Other Side (1986)')
+```
+
+Hasil rekomendasi menampilkan 10 film yang paling mirip dengan film input berdasarkan kemiripan genre. Film-film ini umumnya memiliki genre Horror dan Thriller, menunjukkan bahwa sistem mampu merekomendasikan film dengan konten yang serupa secara akurat.
+| No | Movie Name                   | Genre                  |
+|----|-----------------------------|------------------------|
+| 1  | Haunting, The (1963)        | Horror\|Thriller       |
+| 2  | Haunting, The (1999)        | Horror\|Thriller       |
+| 3  | Cujo (1983)                 | Horror\|Thriller       |
+| 4  | Poltergeist (1982)          | Horror\|Thriller       |
+| 5  | Children of the Corn (1984) | Horror\|Thriller       |
+| 6  | Birds, The (1963)           | Horror\|Thriller       |
+| 7  | Final Destination 2 (2003)  | Horror\|Thriller       |
+| 8  | Session 9 (2001)            | Horror\|Thriller       |
+| 9  | Blair Witch Project, The (1999) | Drama\|Horror\|Thriller |
+| 10 | Ginger Snaps (2000)         | Drama\|Horror\|Thriller |
+
+
+**c. Kelebihan dan Kekurangan Content Based Filtering**
+
+**Kelebihan:**
+- Rekomendasi bersifat personal karena didasarkan pada preferensi pengguna itu sendiri.
+- Dapat memberikan rekomendasi untuk item baru yang belum pernah dirating oleh pengguna lain (mengatasi cold-start pada item).
+- Tidak terpengaruh oleh preferensi mayoritas, cocok untuk pengguna dengan selera unik.
+- Lebih mudah menjelaskan alasan di balik rekomendasi karena berdasarkan kemiripan fitur.
+
+**Kekurangan:**
+- Rekomendasi cenderung terbatas pada item yang mirip dengan yang sudah disukai pengguna sebelumnya (kurang bervariasi).
+- Memerlukan data fitur atau metadata yang lengkap dan relevan untuk setiap item, seperti genre, sinopsis, atau tahun rilis.
+- Tidak dapat menangkap preferensi implisit atau pola minat yang kompleks dari pengguna.
+
+### 2. Model Sistem Rekomendasi Collaborative Filtering
+
+Collaborative Filtering memanfaatkan interaksi antara pengguna (userId) dan item (movieId) dalam bentuk rating untuk membangun model rekomendasi. Model ini berbasis Matrix Factorization dengan embedding untuk menangkap hubungan laten antar user dan film.
+
+**a. Parameter yang Digunakan:**
+
+* `embedding_size`: 50
+* `loss`: BinaryCrossentropy
+* `optimizer`: Adam
+* `metrics`: : Root Mean Squared Error (RMSE) dan Mean Absolute Error (MAE)
+
+**b. Pelatihan Model**
 
 Model rekomendasi dibuat menggunakan pendekatan *Matrix Factorization* yang mengandalkan layer embedding untuk merepresentasikan pengguna dan film ke dalam vektor berdimensi rendah. Kelas `RecommenderNet` diturunkan dari `tf.keras.Model` dan terdiri atas:
 
@@ -473,40 +477,8 @@ history = model.fit(
     validation_data=(x_val, y_val)
 )
 ```
-#### Kelebihan dan Kekurangan Collaborative Filtering
 
-**Kelebihan:**
-- Dapat memberikan rekomendasi berdasarkan pola perilaku kolektif dari banyak pengguna.
-- Mampu menyarankan item yang belum pernah dilihat atau diberi rating oleh pengguna, selama ada pola kemiripan dengan pengguna lain.
-- Lebih fleksibel dalam mengeksplorasi item baru yang mungkin tidak mirip secara konten tetapi disukai oleh pengguna serupa.
-
-**Kekurangan:**
-- Mengalami masalah cold-start untuk pengguna baru karena belum ada riwayat interaksi atau rating.
-- Rentan terhadap masalah sparsity jika data interaksi pengguna terhadap item sangat sedikit.
-- Lebih sulit untuk menjelaskan secara eksplisit alasan munculnya suatu rekomendasi karena berbasis pola rating.
-- Membutuhkan data dalam jumlah besar dan distribusi interaksi yang merata agar performanya optimal.
-
-## Evaluasi
-
-### Visualisasi Performa Model
-
-Untuk mengevaluasi performa model dari waktu ke waktu, kita dapat memvisualisasikan nilai *Root Mean Squared Error* (RMSE) dan *Mean Absolute Error* (MAE) pada data latih dan validasi selama proses pelatihan.
-
-Plot ini membantu mengamati:
-
-- Apakah model mengalami **overfitting** (jika error validasi meningkat sementara error pelatihan terus menurun),
-- Apakah model sudah **konvergen** (jika error validasi dan pelatihan stabil),
-- Seberapa besar perbedaan error antara data latih dan data validasi.
-
-![Visualisasi Performa Model](images/rmse.png)
-
-Grafik menunjukkan bahwa nilai root mean squared error (RMSE) pada data pelatihan mengalami penurunan tajam di awal pelatihan dan kemudian stabil di sekitar angka 0.19, yang mengindikasikan bahwa model berhasil belajar dengan baik dari data. Sementara itu, nilai RMSE pada data pengujian juga menurun di awal dan stabil di kisaran 0.206–0.208. Meskipun terdapat selisih antara performa pada data pelatihan dan pengujian, tren keduanya cenderung stabil tanpa fluktuasi besar, yang menunjukkan bahwa model memiliki kinerja yang cukup baik dan konsisten selama proses pelatihan.
-
-![Visualisasi Performa Model](images/mae.png)
-
-Grafik MAE menunjukkan bahwa nilai error pada data training menurun tajam di awal epoch dan terus membaik hingga mencapai nilai yang stabil mendekati 0.145, sementara nilai MAE pada data validasi juga mengalami penurunan pada awal pelatihan namun kemudian cenderung stabil di kisaran 0.16 dengan sedikit fluktuasi. Pola ini mengindikasikan bahwa model mampu belajar dengan baik dari data training dan mempertahankan performa yang cukup konsisten pada data validasi. Meskipun tidak ada penurunan signifikan pada MAE validasi setelah beberapa epoch, performa model secara keseluruhan terlihat cukup baik dan stabil. 
-
-## Implementasi Model Untuk Sistem Rekomendasi Film
+**c. Hasil Rekomendasi Top-N dari Collaboarative Filtering**
 
 Tahapan ini digunakan untuk **menampilkan rekomendasi film** kepada seorang pengguna berdasarkan model prediktif yang telah dilatih sebelumnya. Secara garis besar, proses yang dilakukan adalah sebagai berikut:
 
@@ -547,6 +519,39 @@ Sehingga di dapatkan hasil seperti ini:
 | 8  | Wild Parrots of Telegraph Hill, The (2003)   | Documentary                                |
 | 9  | Reefer Madness: The Movie Musical (2005)     | Comedy, Drama, Musical                     |
 | 10 | Paterson                                     | (no genres listed)                         |
+
+**d. Kelebihan dan Kekurangan Collaborative Filtering**
+
+**Kelebihan:**
+- Dapat memberikan rekomendasi berdasarkan pola perilaku kolektif dari banyak pengguna.
+- Mampu menyarankan item yang belum pernah dilihat atau diberi rating oleh pengguna, selama ada pola kemiripan dengan pengguna lain.
+- Lebih fleksibel dalam mengeksplorasi item baru yang mungkin tidak mirip secara konten tetapi disukai oleh pengguna serupa.
+
+**Kekurangan:**
+- Mengalami masalah cold-start untuk pengguna baru karena belum ada riwayat interaksi atau rating.
+- Rentan terhadap masalah sparsity jika data interaksi pengguna terhadap item sangat sedikit.
+- Lebih sulit untuk menjelaskan secara eksplisit alasan munculnya suatu rekomendasi karena berbasis pola rating.
+- Membutuhkan data dalam jumlah besar dan distribusi interaksi yang merata agar performanya optimal.
+
+## Evaluasi
+
+### Visualisasi Performa Model
+
+Untuk mengevaluasi performa model dari waktu ke waktu, kita dapat memvisualisasikan nilai *Root Mean Squared Error* (RMSE) dan *Mean Absolute Error* (MAE) pada data latih dan validasi selama proses pelatihan.
+
+Plot ini membantu mengamati:
+
+- Apakah model mengalami **overfitting** (jika error validasi meningkat sementara error pelatihan terus menurun),
+- Apakah model sudah **konvergen** (jika error validasi dan pelatihan stabil),
+- Seberapa besar perbedaan error antara data latih dan data validasi.
+
+![Visualisasi Performa Model](images/rmse.png)
+
+Grafik menunjukkan bahwa nilai root mean squared error (RMSE) pada data pelatihan mengalami penurunan tajam di awal pelatihan dan kemudian stabil di sekitar angka 0.19, yang mengindikasikan bahwa model berhasil belajar dengan baik dari data. Sementara itu, nilai RMSE pada data pengujian juga menurun di awal dan stabil di kisaran 0.206–0.208. Meskipun terdapat selisih antara performa pada data pelatihan dan pengujian, tren keduanya cenderung stabil tanpa fluktuasi besar, yang menunjukkan bahwa model memiliki kinerja yang cukup baik dan konsisten selama proses pelatihan.
+
+![Visualisasi Performa Model](images/mae.png)
+
+Grafik MAE menunjukkan bahwa nilai error pada data training menurun tajam di awal epoch dan terus membaik hingga mencapai nilai yang stabil mendekati 0.145, sementara nilai MAE pada data validasi juga mengalami penurunan pada awal pelatihan namun kemudian cenderung stabil di kisaran 0.16 dengan sedikit fluktuasi. Pola ini mengindikasikan bahwa model mampu belajar dengan baik dari data training dan mempertahankan performa yang cukup konsisten pada data validasi. Meskipun tidak ada penurunan signifikan pada MAE validasi setelah beberapa epoch, performa model secara keseluruhan terlihat cukup baik dan stabil. 
 
 ## Evaluasi Terhadap Bussiness Understanding
 
