@@ -372,7 +372,7 @@ y_val = y[split_point:]
 print(x, y)
 ```
 
-## Modeling
+## Modeling & Result
 
 Pada tahap ini, sistem rekomendasi film dikembangkan menggunakan dua pendekatan utama: Content-Based Filtering dan Collaborative Filtering. Masing-masing pendekatan memiliki karakteristik, parameter, kelebihan, dan kekurangannya dalam menghasilkan rekomendasi yang relevan bagi pengguna. Pendekatan Content-Based Filtering digunakan untuk merekomendasikan film berdasarkan kemiripan konten, khususnya genre film, sementara Collaborative Filtering akan memanfaatkan data interaksi pengguna, seperti rating dan tag, untuk mengidentifikasi pola preferensi yang serupa antar pengguna. 
 
