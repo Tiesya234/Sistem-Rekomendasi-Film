@@ -382,10 +382,8 @@ Content-Based Filtering bekerja dengan menganalisis fitur konten dari setiap fil
 
 **a. Parameter Model yang Digunakan:**
 
-- **Fitur teks**: Kolom `genres` dari setiap film.
-- **TF-IDF Vectorizer**: Mengubah data genre menjadi representasi numerik berbasis teks.
-  - `TfidfVectorizer()`: Mengubah genre menjadi fitur numerik.
-- **Cosine Similarity**: Untuk menghitung kemiripan antar film berdasarkan nilai TF-IDF.
+- Cosine Similarity: Mengukur kemiripan antar film berdasarkan representasi vektor genre yang telah diproses pada tahap Data Preparation.
+- Fungsi rekomendasi: Menghasilkan daftar film paling mirip dengan input film berdasarkan kemiripan genre.
 
 **b. Hasil Rekomendasi Top-N dari Content-Based Filtering**
 
@@ -545,13 +543,24 @@ Plot ini membantu mengamati:
 - Apakah model sudah **konvergen** (jika error validasi dan pelatihan stabil),
 - Seberapa besar perbedaan error antara data latih dan data validasi.
 
+Hasil evaluasi model pada epoch terakhir adalah sebagai berikut:
+
+- **RMSE Training**: 0.2002  
+- **RMSE Validation**: 0.208  
+- **MAE Training**: 0.1563  
+- **MAE Validation**: 0.161
+
 ![Visualisasi Performa Model](images/rmse.png)
 
-Grafik menunjukkan bahwa nilai root mean squared error (RMSE) pada data pelatihan mengalami penurunan tajam di awal pelatihan dan kemudian stabil di sekitar angka 0.19, yang mengindikasikan bahwa model berhasil belajar dengan baik dari data. Sementara itu, nilai RMSE pada data pengujian juga menurun di awal dan stabil di kisaran 0.206–0.208. Meskipun terdapat selisih antara performa pada data pelatihan dan pengujian, tren keduanya cenderung stabil tanpa fluktuasi besar, yang menunjukkan bahwa model memiliki kinerja yang cukup baik dan konsisten selama proses pelatihan.
+Grafik menunjukkan bahwa nilai Root Mean Squared Error (RMSE) pada data pelatihan mengalami penurunan tajam di awal pelatihan dan kemudian stabil di kisaran 0.20, dengan nilai akhir pada epoch terakhir sebesar 0.2002.
+Sementara itu, nilai RMSE pada data validasi juga menurun di awal dan kemudian stabil di angka 0.208.
+Meskipun terdapat selisih antara performa pada data pelatihan dan validasi, keduanya menunjukkan tren yang stabil tanpa fluktuasi besar, yang mengindikasikan bahwa model mampu belajar dengan baik dari data dan memiliki performa yang konsisten selama proses pelatihan.
 
 ![Visualisasi Performa Model](images/mae.png)
 
-Grafik MAE menunjukkan bahwa nilai error pada data training menurun tajam di awal epoch dan terus membaik hingga mencapai nilai yang stabil mendekati 0.145, sementara nilai MAE pada data validasi juga mengalami penurunan pada awal pelatihan namun kemudian cenderung stabil di kisaran 0.16 dengan sedikit fluktuasi. Pola ini mengindikasikan bahwa model mampu belajar dengan baik dari data training dan mempertahankan performa yang cukup konsisten pada data validasi. Meskipun tidak ada penurunan signifikan pada MAE validasi setelah beberapa epoch, performa model secara keseluruhan terlihat cukup baik dan stabil. 
+Grafik Mean Absolute Error (MAE) menunjukkan bahwa nilai error pada data training menurun tajam di awal pelatihan dan mencapai nilai stabil di sekitar 0.1563 pada epoch terakhir.
+Sementara itu, MAE pada data validasi juga menurun di awal dan kemudian stabil di kisaran 0.161, dengan sedikit fluktuasi.
+Pola ini menunjukkan bahwa model tidak hanya akurat terhadap data latih, tetapi juga mempertahankan performa yang cukup stabil dan konsisten terhadap data validasi.
 
 ## Evaluasi Terhadap Bussiness Understanding
 
