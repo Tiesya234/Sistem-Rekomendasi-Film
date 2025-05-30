@@ -618,7 +618,7 @@ Hasil evaluasi model pada epoch terakhir adalah sebagai berikut:
 - **MAE Training**: 0.1563  
 - **MAE Validation**: 0.161
 
-![Visualisasi Performa Model](images/rmse.png)
+![Visualisasi Performa Model](images/rmse_1.png)
 
 Grafik menunjukkan bahwa nilai RMSE pada data pelatihan mengalami penurunan tajam di awal pelatihan dan kemudian stabil di kisaran 0.20, dengan nilai akhir pada epoch terakhir sebesar 0.2002.
 Sementara itu, nilai RMSE pada data validasi juga menurun di awal dan kemudian stabil di angka 0.208.
