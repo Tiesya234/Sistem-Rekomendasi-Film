@@ -1,7 +1,11 @@
 # Laporan Proyek Machine Learning -Tiesya Andriani Ramadhanti
 ## Project Overview
 ### Latar Belakang
-Dalam era digital saat ini, jumlah konten hiburan seperti film terus meningkat secara signifikan. Pengguna sering kali menghadapi kesulitan dalam memilih film yang sesuai dengan preferensi mereka akibat banyaknya pilihan yang tersedia. Oleh karena itu, dibutuhkan sebuah sistem yang dapat membantu pengguna untuk menemukan film yang relevan dan sesuai dengan minat mereka secara otomatis. Salah satu solusi yang umum digunakan adalah **sistem rekomendasi film** (*movie recommendation system*).Sistem rekomendasi telah menjadi komponen penting dalam berbagai platform digital seperti Netflix, YouTube, dan Amazon. Sistem ini memanfaatkan teknik kecerdasan buatan dan pembelajaran mesin untuk menganalisis data historis pengguna dan menghasilkan rekomendasi yang dipersonalisasi.Pada proyek ini, dibangun sebuah sistem rekomendasi film menggunakan **dataset dari Kaggle** yang berjudul [*Movie Recommendation Data*](https://www.kaggle.com/datasets/rohan4050/movie-recommendation-data). Dataset ini berisi informasi mengenai pengguna, film, dan rating yang diberikan, yang dapat digunakan untuk membangun model rekomendasi berbasis konten (*content-based filtering*) maupun berbasis kolaboratif (*collaborative filtering*).
+
+Dalam era digital saat ini, jumlah konten hiburan seperti film terus meningkat secara signifikan. Pengguna sering kali menghadapi kesulitan dalam memilih film yang sesuai dengan preferensi mereka akibat banyaknya pilihan yang tersedia. Oleh karena itu, dibutuhkan sebuah sistem yang dapat membantu pengguna untuk menemukan film yang relevan dan sesuai dengan minat mereka secara otomatis. Salah satu solusi yang umum digunakan adalah **sistem rekomendasi film** (*movie recommendation system*).
+Sistem rekomendasi telah menjadi komponen penting dalam berbagai platform digital seperti Netflix, YouTube, dan Amazon. Sistem ini memanfaatkan teknik kecerdasan buatan dan pembelajaran mesin untuk menganalisis data historis pengguna dan menghasilkan rekomendasi yang dipersonalisasi. Menurut **Yang dan Woradit (2025)**, sistem rekomendasi hibrida yang menggabungkan pendekatan berbasis konten dan kolaboratif mampu meningkatkan akurasi rekomendasi hingga 10%, yang menjadikannya semakin krusial dalam meningkatkan pengalaman pengguna di platform-platform besar.
+Pada proyek ini, dibangun sebuah sistem rekomendasi film menggunakan **dataset dari Kaggle** yang berjudul [*Movie Recommendation Data*](https://www.kaggle.com/datasets/rohan4050/movie-recommendation-data). Dataset ini berisi informasi mengenai pengguna, film, dan rating yang diberikan, yang dapat digunakan untuk membangun model rekomendasi berbasis konten (*content-based filtering*) maupun berbasis kolaboratif (*collaborative filtering*).
+
 Tujuan dari proyek ini adalah untuk:
 - Menganalisis preferensi pengguna terhadap film berdasarkan data rating.
 - Mengembangkan model yang mampu merekomendasikan film secara personal.
@@ -493,30 +497,32 @@ Tahapan ini digunakan untuk **menampilkan rekomendasi film** kepada seorang peng
    Terakhir, 10 film yang direkomendasikan berdasarkan prediksi ditampilkan bersama dengan nama dan genre-nya, memberikan saran yang dipersonalisasi untuk pengguna.
 
 Sehingga di dapatkan hasil seperti ini:
-
-### Rekomendasi Film untuk Pengguna: 234
+### Rekomendasi Film untuk Pengguna: 480
 
 #### Film dengan Rating Tertinggi oleh Pengguna
 
-| Judul Film               | Genre                                    |
-|--------------------------|-------------------------------------------|
-| Toy Story (1995)         | Adventure, Animation, Children, Comedy, Fantasy |
-| Batman Forever (1995)    | Action, Adventure, Comedy, Crime          |
+| Judul Film              | Genre                         |
+|------------------------|------------------------------|
+| Office Space (1999)     | Comedy, Crime                |
+| Matrix, The (1999)      | Action, Sci-Fi, Thriller    |
+| Big (1988)              | Comedy, Drama, Fantasy, Romance |
+| Christmas Story, A (1983)| Children, Comedy             |
 
 #### Top 10 Rekomendasi Film
 
-| No | Judul Film                                  | Genre                                      |
-|----|----------------------------------------------|---------------------------------------------|
-| 1  | Two Family House (2000)                      | Drama                                      |
-| 2  | Hope and Glory (1987)                        | Drama                                      |
-| 3  | More (1998)                                  | Animation, Drama, Sci-Fi, IMAX             |
-| 4  | Lady Jane (1986)                             | Drama, Romance                             |
-| 5  | Awful Truth, The (1937)                      | Comedy, Romance                            |
-| 6  | Come and See (Idi i smotri) (1985)           | Drama, War                                 |
-| 7  | Adam's Rib (1949)                            | Comedy, Romance                            |
-| 8  | Wild Parrots of Telegraph Hill, The (2003)   | Documentary                                |
-| 9  | Reefer Madness: The Movie Musical (2005)     | Comedy, Drama, Musical                     |
-| 10 | Paterson                                     | (no genres listed)                         |
+| No | Judul Film                   | Genre                           |
+|----|-----------------------------|--------------------------------|
+| 1  | Paths of Glory (1957)        | Drama, War                     |
+| 2  | Last Days of Disco, The (1998)| Comedy, Drama                  |
+| 3  | More (1998)                  | Animation, Drama, Sci-Fi, IMAX |
+| 4  | Crossing Delancey (1988)     | Comedy, Romance                |
+| 5  | Lady Jane (1986)             | Drama, Romance                |
+| 6  | Awful Truth, The (1937)      | Comedy, Romance                |
+| 7  | Woman Under the Influence, A (1974)| Drama                  |
+| 8  | Adam's Rib (1949)            | Comedy, Romance                |
+| 9  | Safety Last! (1923)          | Action, Comedy, Romance        |
+| 10 | Jetée, La (1962)             | Romance, Sci-Fi                |
+
 
 **d. Kelebihan dan Kekurangan Collaborative Filtering**
 
@@ -531,11 +537,73 @@ Sehingga di dapatkan hasil seperti ini:
 - Lebih sulit untuk menjelaskan secara eksplisit alasan munculnya suatu rekomendasi karena berbasis pola rating.
 - Membutuhkan data dalam jumlah besar dan distribusi interaksi yang merata agar performanya optimal.
 
+
 ## Evaluasi
 
-### Visualisasi Performa Model
+### Evaluasi Content-Based Filtering
 
-Untuk mengevaluasi performa model dari waktu ke waktu, kita dapat memvisualisasikan nilai *Root Mean Squared Error* (RMSE) dan *Mean Absolute Error* (MAE) pada data latih dan validasi selama proses pelatihan.
+Berbeda dengan Collaborative Filtering yang berbasis prediksi rating, pendekatan Content-Based Filtering dievaluasi berdasarkan **seberapa relevan** rekomendasi yang diberikan terhadap preferensi pengguna. Oleh karena itu, digunakan metrik **Precision@K** dan **Recall@K**.
+
+#### Precision@K
+
+- **Precision@K** mengukur proporsi film yang direkomendasikan oleh sistem yang benar-benar relevan bagi pengguna.  
+- Nilai precision yang tinggi berarti sistem rekomendasi mampu memberikan rekomendasi yang tepat sasaran dan meminimalkan rekomendasi yang tidak sesuai dengan preferensi pengguna.
+
+Rumus Precision@K:
+
+$$
+\text{Precision@K} = \frac{|\text{Recommended Items} \cap \text{Relevant Items}|}{K}
+$$
+
+#### Recall@K
+
+- **Recall@K** mengukur proporsi film relevan yang berhasil ditemukan dan direkomendasikan oleh sistem dari seluruh film yang relevan di dataset.  
+- Nilai recall yang tinggi menunjukkan sistem mampu menemukan sebagian besar film yang disukai pengguna, sehingga cakupan rekomendasi cukup baik.
+
+Rumus Recall@K:
+
+$$
+\text{Recall@K} = \frac{|\text{Recommended Items} \cap \text{Relevant Items}|}{|\text{Relevant Items}|}
+$$
+
+Dimana:  
+- *Recommended Items* adalah daftar film yang direkomendasikan oleh sistem (Top-K),  
+- *Relevant Items* adalah film yang benar-benar disukai pengguna (misalnya berdasarkan rating ≥ 4),  
+- *K* adalah jumlah film teratas yang direkomendasikan.
+
+Kedua metrik ini saling melengkapi, dimana precision menekankan pada ketepatan rekomendasi, sementara recall menekankan pada kelengkapan rekomendasi. Dalam konteks sistem rekomendasi film, keseimbangan antara precision dan recall penting agar pengguna mendapatkan rekomendasi yang sesuai sekaligus beragam.
+
+#### Hasil Evaluasi Precision@K dan Recall@K
+
+Evaluasi dilakukan berdasarkan rekomendasi yang diberikan untuk film **"Poltergeist II: The Other Side (1986)"** dengan nilai *K = 10*. Diperoleh hasil sebagai berikut:
+
+- **Precision@10** = 0.8000  
+- **Recall@10** = 0.8889  
+- **Relevant Recommended** = 8  
+- **Total Relevant in Dataset** = 9
+
+Hasil ini menunjukkan bahwa dari 10 film yang direkomendasikan, 8 di antaranya memang termasuk film yang relevan bagi pengguna (berdasarkan kesamaan genre dan histori penilaian). Sistem mampu mengenali genre atau konten yang relevan dengan sangat baik, sehingga evaluasi CBF menunjukkan performa yang tinggi dalam hal akurasi dan cakupan.
+
+### Evaluasi Collaborative Filtering
+
+Untuk mengevaluasi performa model Collaborative Filtering, digunakan dua metrik utama yaitu **Root Mean Squared Error (RMSE)** dan **Mean Absolute Error (MAE)**. Kedua metrik ini digunakan untuk mengukur seberapa dekat prediksi model terhadap rating aktual yang diberikan oleh pengguna.
+
+#### Rumus RMSE dan MAE
+
+$$
+\text{RMSE} = \sqrt{ \frac{1}{n} \sum_{i=1}^{n} (\hat{y}_i - y_i)^2 }
+$$
+
+$$
+\text{MAE} = \frac{1}{n} \sum_{i=1}^{n} |\hat{y}_i - y_i|
+$$
+
+Dimana:
+- ŷᵢ adalah nilai prediksi rating,
+- yᵢ adalah nilai rating sebenarnya,
+- n adalah jumlah sampel.
+
+### Visualisasi Performa Model
 
 Plot ini membantu mengamati:
 
@@ -552,13 +620,13 @@ Hasil evaluasi model pada epoch terakhir adalah sebagai berikut:
 
 ![Visualisasi Performa Model](images/rmse.png)
 
-Grafik menunjukkan bahwa nilai Root Mean Squared Error (RMSE) pada data pelatihan mengalami penurunan tajam di awal pelatihan dan kemudian stabil di kisaran 0.20, dengan nilai akhir pada epoch terakhir sebesar 0.2002.
+Grafik menunjukkan bahwa nilai RMSE pada data pelatihan mengalami penurunan tajam di awal pelatihan dan kemudian stabil di kisaran 0.20, dengan nilai akhir pada epoch terakhir sebesar 0.2002.
 Sementara itu, nilai RMSE pada data validasi juga menurun di awal dan kemudian stabil di angka 0.208.
 Meskipun terdapat selisih antara performa pada data pelatihan dan validasi, keduanya menunjukkan tren yang stabil tanpa fluktuasi besar, yang mengindikasikan bahwa model mampu belajar dengan baik dari data dan memiliki performa yang konsisten selama proses pelatihan.
 
 ![Visualisasi Performa Model](images/mae.png)
 
-Grafik Mean Absolute Error (MAE) menunjukkan bahwa nilai error pada data training menurun tajam di awal pelatihan dan mencapai nilai stabil di sekitar 0.1563 pada epoch terakhir.
+Grafik MAE menunjukkan bahwa nilai error pada data training menurun tajam di awal pelatihan dan mencapai nilai stabil di sekitar 0.1563 pada epoch terakhir.
 Sementara itu, MAE pada data validasi juga menurun di awal dan kemudian stabil di kisaran 0.161, dengan sedikit fluktuasi.
 Pola ini menunjukkan bahwa model tidak hanya akurat terhadap data latih, tetapi juga mempertahankan performa yang cukup stabil dan konsisten terhadap data validasi.
 
@@ -594,5 +662,7 @@ Solusi yang dirancang membawa dampak signifikan dalam meningkatkan kualitas peng
 Proyek ini berhasil mengembangkan sistem rekomendasi film yang menggabungkan pendekatan Content-Based dan Collaborative Filtering secara efektif. Dimulai dari pemahaman masalah (Business Understanding), eksplorasi dan pengolahan data (Data Understanding & Preparation), hingga pengembangan dan evaluasi model, sistem mampu memenuhi tujuan yang telah ditetapkan.
 
 Dengan memanfaatkan informasi konten dan interaksi pengguna, sistem dapat memberikan rekomendasi film yang lebih relevan dan personal. Rekomendasi yang dihasilkan tidak hanya membantu pengguna menemukan film yang sesuai dengan minat mereka, tetapi juga memperkenalkan film-film yang sebelumnya kurang terekspos. Hal ini dapat meningkatkan kepuasan pengguna sekaligus membuka peluang baru dalam distribusi dan konsumsi konten film. Sistem ini menjadi solusi digital yang efektif dalam menyederhanakan proses pemilihan film dan meningkatkan pengalaman menonton secara keseluruhan.
+
+
 
 
